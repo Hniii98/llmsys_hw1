@@ -119,6 +119,9 @@ A[1][2] = Adata[1 * strides[0] + 2 * strides[1]]
    python -m pytest -l -v -k "cuda_one_args"    # for map
    ```
 
+   You may encounter *Fatal Error*, it means your cuda implementation is buggy. 
+   You could try to debug your code by adding print statements to your cuda code to print the values of the intermediate variables.
+
 ## Problem 2: Zip Operation CUDA Kernel + Integration (20 points)
 
 Implement the CUDA kernel for element-wise zip operations and integrate it with the framework. This operation applies a binary function to corresponding elements from two input tensors, producing a new tensor with the same shape. For example, applying addition `f(x,y) = x + y` to tensors `[1, 2, 3]` and `[4, 5, 6]` yields `[5, 7, 9]`. 
