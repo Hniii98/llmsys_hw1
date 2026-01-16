@@ -8,6 +8,7 @@ from .tensor_data import (
 from .tensor_ops import MapProto, TensorOps
 import os
 import ctypes
+import platform
 import numpy as np
 import pycuda.gpuarray as gpuarray
 import pycuda.driver as drv
@@ -16,9 +17,12 @@ import pycuda.autoinit
 
 # Load the shared library
 try:
-    lib = ctypes.CDLL("minitorch/cuda_kernels/combine.so")
+    if platform.system() == "Windows":
+        lib = ctypes.CDLL("minitorch/cuda_kernels/combine.dll")
+    else:
+        lib = ctypes.CDLL("minitorch/cuda_kernels/combine.so")
 except:
-    print("cuda kernels not implemented: combine.so not found")
+    print("cuda kernels not implemented: combine.dll/.so not found")
 
 datatype = np.float32
 
