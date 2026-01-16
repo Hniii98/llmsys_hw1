@@ -4,6 +4,13 @@
 #include <sstream>
 #include <fstream>
 
+// Platform-specific export macros
+#ifdef _WIN32
+    #define DLL_EXPORT __declspec(dllexport)
+#else
+    #define DLL_EXPORT
+#endif
+
 #define BLOCK_DIM 1024
 #define MAX_DIMS 10
 #define TILE 32
@@ -268,8 +275,16 @@ __global__ void mapKernel(
   // 4. Calculate the position of element in in_array according to in_index and in_strides
   // 5. Calculate the position of element in out_array according to out_index and out_strides
   // 6. Apply the unary function to the input element and write the output to the out memory
+  int out_pos = blockIdx.x * blockDim.x + threadIdx.x;
 
-  assert(false && "Not Implemented");
+  if(out_pos < out_size)
+  {
+    to_index(out_pos, out_shape, out_index, shape_size);
+    broadcast_index(out_index, out_shape, in_shape, in_index, shape_size, shape_size);
+    int in_pos = index_to_position(in_index, in_strides, shape_size);  
+
+    out[out_pos] = fn(fn_id, in_storage[in_pos]);
+  }
   /// END HW1_1
 }
 
@@ -390,8 +405,9 @@ __global__ void reduceKernel(
   // 3. Initialize the reduce_value to the output element
   // 4. Iterate over the reduce_dim dimension of the input array to compute the reduced value
   // 5. Write the reduced value to out memory
+  
 
-  assert(false && "Not Implemented");
+
   /// END HW1_3
 }
 
@@ -458,7 +474,7 @@ __global__ void MatrixMultiplyKernel(
 extern "C"
 {
 
-  void MatrixMultiply(
+  DLL_EXPORT void MatrixMultiply(
       float *out,
       int *out_shape,
       int *out_strides,
@@ -527,7 +543,7 @@ extern "C"
     cudaFree(d_b_strides);
   }
 
-  void tensorMap(
+  DLL_EXPORT void tensorMap(
       float *out,
       int *out_shape,
       int *out_strides,
@@ -585,7 +601,7 @@ extern "C"
     cudaFree(d_in_strides);
   }
 
-  void tensorZip(
+  DLL_EXPORT void tensorZip(
       float *out,
       int *out_shape,
       int *out_strides,
@@ -660,7 +676,7 @@ extern "C"
     cudaFree(d_b_strides);
   }
 
-  void tensorReduce(
+  DLL_EXPORT void tensorReduce(
       float *out,
       int *out_shape,
       int *out_strides,
